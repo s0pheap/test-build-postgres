@@ -1,0 +1,63 @@
+name: Build and Deploy PostgreSQL
+
+on:
+  workflow_dispatch:
+    inputs:
+      VERSION:
+        description: "Select the PostgreSQL version"
+        required: true
+        type: choice
+        options:
+          - "16_3"
+          - "16_4"
+      CPU:
+        description: "Number of CPU cores to use for compilation"
+        required: true
+        type: choice
+        options:
+          - "1"
+          - "2"
+          - "3"
+          - "4"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up variables
+        run: |
+          export POSTGRES_ARCHIVE=REL_${{ github.event.inputs.VERSION }}.tar.gz
+          export POSTGRES_DIR=postgres-${{ github.event.inputs.VERSION }}
+          export BINARY_FILE=postgres-binary-${{ github.event.inputs.VERSION }}.tar.gz
+        shell: bash
+
+      - name: Download Source
+        run: |
+          wget -q https://github.com/postgres/postgres/archive/refs/tags/$POSTGRES_ARCHIVE -O postgres-source-$POSTGRES_ARCHIVE
+
+      - name: Extract Source
+        run: |
+          tar -zxf postgres-source-$POSTGRES_ARCHIVE
+
+      - name: Compile and Install
+        run: |
+          cd postgres-REL_${{ github.event.inputs.VERSION }}
+          mkdir -p $POSTGRES_DIR
+          ./configure --quiet --prefix=$PWD/$POSTGRES_DIR
+          make -s -j${{ github.event.inputs.CPU }}
+          make -s install
+
+      - name: Package Binary
+        run: |
+          tar -zcf $BINARY_FILE $POSTGRES_DIR
+
+      - name: Upload Binary to Artifactory
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+          scp -o StrictHostKeyChecking=no $BINARY_FILE ${{ vars.ARTIFACTORY_USER }}@${{ vars.ARTIFACTORY_HOST }}:${{ vars.ARTIFACTORY_PATH }}
+
+      - name: Cleanup SSH Key
+        run: ssh-add -D
