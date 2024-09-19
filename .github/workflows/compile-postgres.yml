@@ -32,7 +32,6 @@ jobs:
     steps:
       - name: Download Source
         run: |
-          echo "Downloading from https://github.com/postgres/postgres/archive/refs/tags/$POSTGRES_ARCHIVE"
           curl -sL https://github.com/postgres/postgres/archive/refs/tags/$POSTGRES_ARCHIVE -o postgres-source-$POSTGRES_ARCHIVE
 
       - name: Extract Source
@@ -43,12 +42,14 @@ jobs:
         run: |
           cd postgres-REL_${{ github.event.inputs.VERSION }}
           mkdir -p $POSTGRES_DIR
+          ls
           ./configure --quiet --prefix=$PWD/$POSTGRES_DIR
           make -s -j${{ github.event.inputs.CPU }}
           make -s install
 
       - name: Package Binary
         run: |
+          ls
           tar -zcf $BINARY_FILE $POSTGRES_DIR
 
       - name: Upload Binary to Artifactory
