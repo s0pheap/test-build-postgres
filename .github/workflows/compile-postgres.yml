@@ -51,12 +51,17 @@ jobs:
           cd postgres-REL_${{ github.event.inputs.VERSION }}
           tar -zcf $BINARY_FILE $POSTGRES_DIR
 
-      - name: Upload Binary to Artifactory
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
-          scp -o StrictHostKeyChecking=no $BINARY_FILE ${{ vars.ARTIFACTORY_USER }}@${{ vars.ARTIFACTORY_HOST }}:${{ vars.ARTIFACTORY_PATH }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: postgres-binary
+          path: postgres-REL_${{ github.event.inputs.VERSION }}/$BINARY_FILE
 
-      - name: Cleanup SSH Key
-        run: ssh-add -D
+    #   - name: Upload Binary to Artifactory
+    #     env:
+    #       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+    #     run: |
+    #       echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    #       scp -o StrictHostKeyChecking=no $BINARY_FILE ${{ vars.ARTIFACTORY_USER }}@${{ vars.ARTIFACTORY_HOST }}:${{ vars.ARTIFACTORY_PATH }}
+
+    #   - name: Cleanup SSH Key
+    #     run: ssh-add -D
