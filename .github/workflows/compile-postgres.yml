@@ -27,14 +27,15 @@ jobs:
     steps:
       - name: Set up variables
         run: |
-          POSTGRES_ARCHIVE=REL_${{ github.event.inputs.VERSION }}.tar.gz
-          POSTGRES_DIR=postgres-${{ github.event.inputs.VERSION }}
-          BINARY_FILE=postgres-binary-${{ github.event.inputs.VERSION }}.tar.gz
+          export POSTGRES_ARCHIVE=REL_${{ github.event.inputs.VERSION }}.tar.gz
+          export POSTGRES_DIR=postgres-${{ github.event.inputs.VERSION }}
+          export BINARY_FILE=postgres-binary-${{ github.event.inputs.VERSION }}.tar.gz
         shell: bash
 
       - name: Download Source
         run: |
-          wget -q https://github.com/postgres/postgres/archive/refs/tags/$POSTGRES_ARCHIVE -O postgres-source-$POSTGRES_ARCHIVE
+          echo "Downloading from https://github.com/postgres/postgres/archive/refs/tags/$POSTGRES_ARCHIVE"
+          curl -sL https://github.com/postgres/postgres/archive/refs/tags/$POSTGRES_ARCHIVE -o postgres-source-$POSTGRES_ARCHIVE
 
       - name: Extract Source
         run: |
