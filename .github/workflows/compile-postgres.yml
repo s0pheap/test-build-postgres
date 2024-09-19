@@ -27,9 +27,9 @@ jobs:
     steps:
       - name: Set up variables
         run: |
-          export POSTGRES_ARCHIVE=REL_${{ github.event.inputs.VERSION }}.tar.gz
-          export POSTGRES_DIR=postgres-${{ github.event.inputs.VERSION }}
-          export BINARY_FILE=postgres-binary-${{ github.event.inputs.VERSION }}.tar.gz
+          POSTGRES_ARCHIVE=REL_${{ github.event.inputs.VERSION }}.tar.gz
+          POSTGRES_DIR=postgres-${{ github.event.inputs.VERSION }}
+          BINARY_FILE=postgres-binary-${{ github.event.inputs.VERSION }}.tar.gz
         shell: bash
 
       - name: Download Source
