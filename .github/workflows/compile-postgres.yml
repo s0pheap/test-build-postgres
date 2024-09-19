@@ -1,4 +1,4 @@
-name: Build and Deploy PostgreSQL
+name: Compile PostgreSQL
 
 on:
   workflow_dispatch:
@@ -42,14 +42,13 @@ jobs:
         run: |
           cd postgres-REL_${{ github.event.inputs.VERSION }}
           mkdir -p $POSTGRES_DIR
-          ls
           ./configure --quiet --prefix=$PWD/$POSTGRES_DIR
           make -s -j${{ github.event.inputs.CPU }}
           make -s install
 
       - name: Package Binary
         run: |
-          ls
+          cd postgres-REL_${{ github.event.inputs.VERSION }}
           tar -zcf $BINARY_FILE $POSTGRES_DIR
 
       - name: Upload Binary to Artifactory
