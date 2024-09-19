@@ -24,14 +24,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Set up variables
-        run: |
-          export POSTGRES_ARCHIVE=REL_${{ github.event.inputs.VERSION }}.tar.gz
-          export POSTGRES_DIR=postgres-${{ github.event.inputs.VERSION }}
-          export BINARY_FILE=postgres-binary-${{ github.event.inputs.VERSION }}.tar.gz
-        shell: bash
+    env:
+      POSTGRES_ARCHIVE: REL_${{ github.event.inputs.VERSION }}.tar.gz
+      POSTGRES_DIR: postgres-${{ github.event.inputs.VERSION }}
+      BINARY_FILE: postgres-binary-${{ github.event.inputs.VERSION }}.tar.gz
 
+    steps:
       - name: Download Source
         run: |
           echo "Downloading from https://github.com/postgres/postgres/archive/refs/tags/$POSTGRES_ARCHIVE"
